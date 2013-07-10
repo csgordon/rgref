@@ -35,13 +35,14 @@ Module Type RCC.
                                {pres:(forall h, P meta_x h -> P meta_e (hwrite x meta_e h))}
                                , rgref Γ unit Γ.
 *)
-  Parameter rcc_write : forall {Γ Γ'}{A:Set}`{rel_fold A}{P R G}`{hreflexive G}{l:lock}{w:var}{pf:tymember w (ref{lockwitness l | locked}[empty,locked-->unlocked]) Γ}(x:rccref A P R G l)(e:rgref Γ A Γ')
+  Parameter rcc_write : forall {Γ Γ'}{A:Set}`{rel_fold A}{P R G}`{hreflexive G}{l:lock}{w:var}{pf:tymember w (ref{lockwitness l | locked}[empty,locked-->unlocked]) Γ}(x:rccref A P R G l)(e:rgref Γ A Γ')`{ESafe 0 _ e}
                                (meta_x_deref:rgref Γ A Γ') (meta_e_fold:rgref Γ A Γ')
                                {guar:forall h env, G (valueOf _ _ _ env h meta_x_deref) (valueOf _ _ _ env h e) h (hwrite x (valueOf _ _ _ env h e) h)}
                                {pres:(forall h env, P (valueOf _ _ _ env h meta_x_deref) h -> P (valueOf _ _ _ env h meta_e_fold) (hwrite x (valueOf _ _ _ env h meta_e_fold) h))}
                                , rgref Γ unit Γ'.
 
   Parameter rcc_alloc : forall {Γ}{T:Set}{RT:ImmediateReachability T}{CT:Containment T}{FT:rel_fold T} P R G (l:lock) (e:T), 
+                `(ESafe 0 e) ->
                 stable P R ->        (* predicate is stable *)
                 (forall h, P e h) -> (* predicate is true *)
                 precise_pred P ->    (* P precise *)
@@ -76,21 +77,22 @@ Module RCCImpl : RCC.
                                {pres:(forall h, P meta_x h -> P meta_e (heap_write x meta_e h))}
                                : rgref Γ unit Γ :=
       @write' Γ A _ P R G _ x e meta_x meta_e _ _.*)
-  Program Definition rcc_write {Γ Γ'}{A:Set}`{rel_fold A}{P R G}`{hreflexive G}{l:lock}{w:var}{pf:tymember w (ref{lockwitness l | locked}[empty,locked-->unlocked]) Γ}(x:rccref A P R G l)(e:rgref Γ A Γ')
+  Program Definition rcc_write {Γ Γ'}{A:Set}`{rel_fold A}{P R G}`{hreflexive G}{l:lock}{w:var}{pf:tymember w (ref{lockwitness l | locked}[empty,locked-->unlocked]) Γ}(x:rccref A P R G l)(e:rgref Γ A Γ')`{ESafe 0 _ e}
                                (meta_x_deref:rgref Γ A Γ') (meta_e_fold:rgref Γ A Γ')
                                {guar:forall h env, G (valueOf _ _ _ env h meta_x_deref) (valueOf _ _ _ env h e) h (hwrite l _ _ _ _ x (valueOf _ _ _ env h e) h)}
                                {pres:(forall h env, P (valueOf _ _ _ env h meta_x_deref) h -> P (valueOf _ _ _ env h meta_e_fold) (hwrite _ _ _ _ _ x (valueOf _ _ _ env h meta_e_fold) h))}
                                : rgref Γ unit Γ' :=
-                               @write_imp_exp Γ Γ' A _ P R G _ x e meta_x_deref meta_e_fold guar pres.
+                               @write_imp_exp Γ Γ' A _ P R G _ x e _ meta_x_deref meta_e_fold guar pres.
 
   Program Definition rcc_alloc {Γ}{T:Set}{RT:ImmediateReachability T}{CT:Containment T}{FT:rel_fold T} P R G (l:lock) (e:T) 
+                `(ESafe 0 _ e)
                 `(stable P R)        (* predicate is stable *)
                 `((forall h, P e h)) (* predicate is true *)
                 `(precise_pred P)    (* P precise *)
                 `(precise_rel R)     (* R precise *)
                 `(precise_rel G)     (* G precise *)
                 : rgref Γ (rccref T P R G l) Γ :=
-      alloc _ _ _ e _ _ _ _ _.
+      alloc _ _ _ e _ _ _ _ _ _.
   Parameter acquire : forall {Γ}(w:var)(l:lock), rgref Γ unit (w:ref{lockwitness l | locked}[empty,locked-->unlocked],Γ).
   Parameter release : forall {Γ}{l:lock}(w:var){pf:(tymember w (ref{lockwitness l | locked}[empty,locked-->unlocked]) Γ)}, rgref Γ unit (tyrem pf).
 End RCCImpl.
@@ -113,13 +115,13 @@ Section RaceFreeMonotonicCounter.
   Program Definition read_counter {Γ}{l:lock}{w:var}{pf:tymember w (ref{lockwitness l | locked}[empty,locked-->unlocked]) Γ}
     (c:rf_monotonic_counter l) : rgref Γ nat Γ :=
     @rcc_read _ _ _ _ _ _ _ l w _ c _ _.
-  Check @rcc_write.
   Local Obligation Tactic := intros; compute [increasing hreflexive]; eauto; try apply natsp.
   Program Definition inc_monotonic {Γ l}{w:var}{pf:tymember w (ref{lockwitness l|locked}[empty,locked-->unlocked]) Γ} (p:rf_monotonic_counter l) : rgref Γ unit Γ :=
     (*rccwrite p <:= ((rcc_read p _ _) + 1).*)
     (* We can't directly add to the read result because that result is monadic.  Instead we have to use pureApp. *)
     @rcc_write Γ Γ nat _ any increasing increasing _ l _ _ p
         (@pureApp _ _ _ _ _ (plus 1) (@rcc_read Γ _ _ _ _ _ _ l w pf p _ _))
+        _
         ({{{@rcc_read Γ _ _ _ _ _ _ l w pf p _ _}}})
         ({{{pureApp _ _ _ _ _ (plus 1) (@rcc_read Γ _ _ _ _ _ _ l w pf p _ _)}}}) _ _.
   Next Obligation.
@@ -136,7 +138,7 @@ Section RaceFreeMonotonicCounter.
   Local Obligation Tactic := intros; eauto with arith; compute; auto with arith; repeat constructor.
   Program Definition mkRFCounter {Γ} (l:lock) : rgref Γ (rf_monotonic_counter l) Γ :=
     (*RCCAlloc l 0.*)
-    rcc_alloc _ _ _ l 0 _ _ _ _ _.
+    rcc_alloc _ _ _ l 0 _ _ _ _ _ _.
   (** Again, remember that the lock witness should really be in a monadic context *)
   Parameter w : var.
   Program Example test_counter {Γ} (l:lock) : rgref Γ unit Γ :=

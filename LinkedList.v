@@ -61,6 +61,7 @@ Inductive list_imm : hrel rgrList' :=
   | imm_cons : forall h h' P R G n (tl:ref{rgrList'|P}[R,G]),
                list_imm (h[tl]) (h'[tl]) h h' ->
                list_imm (rgrl_cons' rgrList' P R G n tl) (rgrl_cons' rgrList' P R G n tl) h h'.
+Instance pure_rgrlist : pure_type rgrList'.
 (** Ideally we'd like to enforce correct instantiation of 
     the recursive components via a predicate like this:
 <<
@@ -197,7 +198,7 @@ Next Obligation. firstorder. eapply plumb_precise; eauto. firstorder. Qed. (** D
 Program Definition cons { Γ P Q}`{precise_pred P} n (tl meta_tl:@list P Q) 
   : rgref Γ (list P _ (* (fun l h=> locally_const list_imm->l=rgrl_cons' rgrList' P list_imm list_imm n (convert_P _ _ _ tl))*)) Γ :=
   (*Alloc! (rgrl_cons' rgrList' P list_imm list_imm n (convert_P _ _ _ tl)).*)
-  alloc' _ _ _ (rgrl_cons' rgrList' P list_imm list_imm n (convert_P _ _ _ tl)) (rgrl_cons' rgrList' P list_imm list_imm n (convert_P _ _ _ meta_tl)) _ _ _ _ _.
+  alloc' _ _ _ (rgrl_cons' rgrList' P list_imm list_imm n (convert_P _ _ _ tl)) (rgrl_cons' rgrList' P list_imm list_imm n (convert_P _ _ _ meta_tl)) _ _ _ _ _ _.
 Next Obligation. firstorder. eapply plumb_stable; eauto. firstorder. eapply stable_P_hack; eauto. Qed.
 (** Again, previous goal is solved by things the obligation tactic should be doing... *)
 Next Obligation. constructor.
@@ -209,6 +210,7 @@ Check cons.
 Notation "'RGCons' n tl ::" := (@cons _ _ _ _ n tl ({{{tl}}})) (at level 100).
 
 Record list_container {P Q} := mkList {head : @list P Q}.
+Instance pure_container {P Q}: pure_type (@list_container P Q).
 
 Inductive reach_list_head : forall {Q Q'}{T:Set}{P R G} (p:ref{T|P}[R,G]) (a:@list_container Q Q'), Prop :=
   | reach_container_head : forall Q Q' T P R G p lst, @reach_list_head Q Q' T P R G p (mkList Q Q' lst).

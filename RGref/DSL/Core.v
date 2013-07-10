@@ -246,6 +246,11 @@ Global Instance ref_fold `{A:Set,P:hpred A,R:hrel A,G:hrel A} : rel_fold (ref{A|
 (* We'll admit the runtime fold for references; the semantics for proofs will need an extensional treatment
    as an axiom. *)
 Admitted.
+Global Instance fn_fold {T : Set}{B : T -> Set} : rel_fold (forall x : T, B x) := {
+    rgfold := fun _ _ => (forall x : T, B x);
+    fold := fun _ _ x => x
+  }.
+
 
 (** TODO: polymorphic lists *)                             
 

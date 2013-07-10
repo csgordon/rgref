@@ -16,8 +16,11 @@ Require Import Coq.Program.Equality.
 
 Inductive appList : Set :=
   | rcons : nat -> ref{option appList|any}[optset appList,optset appList] -> appList.
+Global Instance pure_applist : pure_type appList.
+Global Instance pure_option {A:Set}`{pure_type A} : pure_type (@option A).
 
 Definition alist := ref{option appList|any}[optset appList, optset appList].
+Global Instance pure_alist : pure_type alist.
 
 (** A remarkable number of the generated proof goals can be solved by
     firstorder reasoning or basic proof search. *)
