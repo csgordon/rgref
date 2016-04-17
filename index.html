@@ -51,10 +51,8 @@ formula) that must hold of a reference's referent. If a predicate is preserved b
 relation (i.e. if it is true in one state, and there is another state related to the first by the
 rely relation, then it is true in the second state as well), then it is safe to assume that
 predicate holds in general because the actions possible through any other alias are subsumed by
-the rely.</li>
+the rely.  For more technical details, see Publications below.</li>
 </ol>
-
-<p>For more technical details, see our <a href="">PLDI'13 paper</a>.</p>
 
 <p>There are three implementations of rely-guarantee references:</p>
 
@@ -92,6 +90,20 @@ the rely.</li>
 </ul>
 
 <p>All relevant commands (<code>proofgeneral</code>, <code>coqtop</code>, <code>liquid</code>, etc.) are on the default PATH when you open a terminal.</p>
+
+<h3>
+<a id="publications" class="anchor" href="#publications" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Publications</h3>
+
+<p>For (academic) descriptions of how RGRefs can be used, see:</p>
+
+<ul>
+<li>
+<a href="http://dl.acm.org/citation.cfm?id=2462160">Rely-Guarantee References for Refinement Types over Aliased Mutable Data</a>.  Colin S. Gordon, Michael D. Ernst, and Dan Grossman.  In Proceedings of PLDI 2013.</li>
+<li>
+<a href="https://dlib.lib.washington.edu/researchworks/handle/1773/26020">Verifying Concurrent Programs by Controlling Alias Interference</a>. Colin Stebbins Gordon.  PhD Dissertation, University of Washington, 2014.</li>
+</ul>
+
+<p>The implementations contain examples not described in the above publications.</p>
 
 <h3>
 <a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h3>
