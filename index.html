@@ -74,7 +74,24 @@ the rely.</li>
 <h3>
 <a id="virtual-machine" class="anchor" href="#virtual-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Virtual Machine</h3>
 
-<p>For a virtual machine image (VirtualBox / .ova) containing the concurrent RGRef Coq DSL, the concurrent RGRef Liquid Haskell embedding, and all dependencies, click here (SOON, not yet uploaded).</p>
+<p>For a virtual machine image (VirtualBox / .ova) containing the concurrent RGRef Coq DSL, the concurrent RGRef Liquid Haskell embedding, and all dependencies, click here (SOON, not yet uploaded).  </p>
+
+<ul>
+<li>Username: rely</li>
+<li>Password: guarantee</li>
+</ul>
+
+<p>Notably, the VM includes:</p>
+
+<ul>
+<li>The Coq DSL and examples pre-built in the <code>rgref-concurrent</code> directory</li>
+<li>ProofGeneral (<code>proofgeneral</code>) and CoqIDE (<code>coqide</code> or <code>coqide.opt</code>) set up and ready to go</li>
+<li>The Liquid Haskell embedding checked out into the <code>rghaskell</code> directory (run the <code>test.sh</code> script to compile the examples)</li>
+<li>The appropriate version of Liquid Haskell compiled and installed (<code>liquid</code>) into a Cabal sandbox inside <code>rghaskell</code>
+</li>
+</ul>
+
+<p>All relevant commands (<code>proofgeneral</code>, <code>coqtop</code>, <code>liquid</code>, etc.) are on the default PATH when you open a terminal.</p>
 
 <h3>
 <a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h3>
