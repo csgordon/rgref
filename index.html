@@ -82,9 +82,19 @@ the rely.  For more technical details, see Publications below.</li>
 <p>Notably, the VM includes:</p>
 
 <ul>
-<li>The Coq DSL and examples pre-built in the <code>rgref-concurrent</code> directory</li>
+<li>The Coq DSL and examples pre-built in the <code>rgref-concurrent</code> directory
+
+<ul>
+<li>You can rebuild by running <code>make clean</code> and <code>./compile.sh</code> in that directory</li>
+</ul>
+</li>
 <li>ProofGeneral (<code>proofgeneral</code>) and CoqIDE (<code>coqide</code> or <code>coqide.opt</code>) set up and ready to go</li>
-<li>The Liquid Haskell embedding checked out into the <code>rghaskell</code> directory (run the <code>test.sh</code> script to compile the examples)</li>
+<li>The Liquid Haskell embedding checked out into the <code>rghaskell</code> directory
+
+<ul>
+<li>Run the <code>test.sh</code> script to compile the examples</li>
+</ul>
+</li>
 <li>The appropriate version of Liquid Haskell compiled and installed (<code>liquid</code>) into a Cabal sandbox inside <code>rghaskell</code>
 </li>
 </ul>
